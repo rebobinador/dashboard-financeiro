@@ -246,7 +246,8 @@ def carregar_dados_aba(gid, nome_aba):
             if coluna in df.columns:
                 df[coluna] = df[coluna].apply(converter_valor_brasileiro)
 
-        if 'data' in df.columns:
+       if 'data' in df.columns:
+            # Garante que TODAS as abas leiam o formato de data como DIA/MÊS/ANO
             df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
             df.dropna(subset=['data'], inplace=True)
 
