@@ -18,4 +18,5 @@ EXPOSE 8501
 
 # O comando que será executado para iniciar seu dashboard
 # O endereço 0.0.0.0 é essencial para que o EasyPanel consiga se comunicar com o app
-CMD ["streamlit", "run", "Dashboard.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# O enableCORS=false ajuda a evitar problemas de comunicação com o navegador
+CMD ["streamlit", "run", "Dashboard.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.enableCORS=false"]
