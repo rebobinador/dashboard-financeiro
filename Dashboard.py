@@ -46,7 +46,7 @@ st.markdown("""
         .metric-card {
             padding: 1rem !important;
             margin-bottom: 1rem !important;
-            min-height: 120px; /* Altura mínima para melhor toque */
+            min-height: 120px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -55,7 +55,6 @@ st.markdown("""
             font-size: 1.5rem !important;
         }
         .stTabs [data-baseweb="tab"] {
-            /* Ocupa a largura inteira no mobile para melhor toque */
             flex: 1 1 auto;
             height: 40px !important;
             padding: 8px !important;
@@ -93,7 +92,7 @@ st.markdown("""
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 5px; /* Espaço entre o texto e o ícone */
+        gap: 5px;
     }
     
     .help-icon {
@@ -120,13 +119,13 @@ st.markdown("""
         padding: 8px;
         position: absolute;
         z-index: 10;
-        bottom: 125%; /* Posição acima do ícone */
+        bottom: 125%;
         left: 50%;
-        margin-left: -110px; /* Metade da largura para centralizar */
+        margin-left: -110px;
         opacity: 0;
         transition: opacity 0.3s;
-        font-size: 0.8rem; /* Tamanho da fonte do tooltip */
-        font-weight: normal; /* Peso da fonte normal */
+        font-size: 0.8rem;
+        font-weight: normal;
     }
 
     .help-icon:hover .tooltip-text {
@@ -163,7 +162,7 @@ st.markdown("""
         font-weight: 600;
         min-width: 80px;
         flex: 1;
-        color: #4F4F4F; /* Cor do texto da aba não selecionada */
+        color: #4F4F4F;
     }
 
     .stTabs [aria-selected="true"] {
@@ -173,13 +172,16 @@ st.markdown("""
 
     /* Ajuste para modo escuro */
     [data-theme="dark"] .stTabs [data-baseweb="tab"] {
-        background-color: #262730; /* Fundo mais escuro para abas inativas */
-        color: #FAFAFA; /* Texto branco para abas inativas */
+        background-color: #262730;
+        color: #FAFAFA;
     }
 
-    [data-testid="stHorizontalBlock"] {
-        align-items: center;
+    /* ### CORREÇÃO DEFINITIVA PARA O ALINHAMENTO ### */
+    /* Este seletor é mais específico e garante o alinhamento vertical dos itens no container do filtro */
+    .st-emotion-cache-1fji0r1 {
+        align-items: flex-end;
     }
+
 </style>
 """, unsafe_allow_html=True)
 
