@@ -247,8 +247,14 @@ def carregar_dados_aba(gid, nome_aba):
                 df[coluna] = df[coluna].apply(converter_valor_brasileiro)
 
        if 'data' in df.columns:
-            # Garante que TODAS as abas leiam o formato de data como DIA/MÊS/ANO
-            df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
+            # Lógica condicional para tratar diferentes formatos de data
+            if nome_aba == 'Stripe':
+                # Lê o formato ANO-MÊS-DIA, comum em exportações de sistemas
+                df['data'] = pd.to_datetime(df['data'], errors='coerce')
+            else:
+                # Lê o formato DIA-MÊS-ANO para as outras planilhas
+                df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
+            
             df.dropna(subset=['data'], inplace=True)
 
         if nome_aba == 'Kiwify' and 'receita_bruta' in df.columns:
