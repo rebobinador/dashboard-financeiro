@@ -176,6 +176,10 @@ st.markdown("""
         background-color: #262730; /* Fundo mais escuro para abas inativas */
         color: #FAFAFA; /* Texto branco para abas inativas */
     }
+
+    [data-testid="stHorizontalBlock"] {
+        align-items: center;
+    }
 </style>
 """, unsafe_allow_html=True)
 
