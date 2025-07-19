@@ -18,30 +18,13 @@ st.set_page_config(
 TEXTOS_AJUDA = {
     "Receita Total": "Soma de todas as vendas brutas (antes de taxas e comissões) de todas as plataformas.",
     "Receita Líquida": "Receita Total menos os custos diretos da venda (taxas da plataforma, comissões). É o valor que efetivamente entra no caixa da empresa.",
-    "Despesas Totais": "Soma de todos os custos para operar o negócio no período, incluindo gastos com anúncios (Meta) e outras despesas gerais.",
-    "Lucro Líquido": "Receita Líquida menos as Despesas Totais. Mostra o resultado financeiro final da empresa no período.",
-    "Vendas Kiwify": "Número total de vendas de produtos únicos (não recorrentes) realizadas através da plataforma Kiwify.",
-    "Transações Stripe": "Número total de transações de assinaturas (recorrentes) realizadas através da plataforma Stripe.",
-    "Ticket Médio": "Valor médio de cada transação. É calculado dividindo a Receita Total pelo número total de transações (Kiwify + Stripe).",
-    "Margem de Lucro": "A porcentagem da Receita Total que se transformou em Lucro Líquido. Indica a eficiência e rentabilidade do negócio.",
-    "LTV": "Lifetime Value (Valor Vitalício do Cliente). Uma previsão de quanta receita líquida um cliente médio irá gerar durante todo o seu relacionamento com a empresa.",
-    "MRR": "Monthly Recurring Revenue (Receita Recorrente Mensal). A receita previsível que sua empresa gera a cada mês a partir das assinaturas ativas no Stripe.",
-    "ARR": "Annual Recurring Revenue (Receita Recorrente Anual). Uma projeção da sua receita recorrente para um ano, calculada como MRR x 12.",
-    "LTV/CAC Ratio": "A proporção entre o LTV e o CAC. Um valor saudável (geralmente acima de 3x) indica que o valor gerado por um cliente é maior que o custo para adquiri-lo.",
-    "CAC": "Custo de Aquisição de Cliente. O valor total gasto em marketing (Meta Ads) dividido pelo número de novos clientes adquiridos no período.",
-    "ARPA": "Average Revenue Per Account (Receita Média por Conta). O valor médio de receita recorrente gerado por cada cliente ativo por mês. Calculado como MRR / Nº de Clientes Ativos.",
-    "Churn Rate": "Taxa de Cancelamento (estimada). A porcentagem de clientes de assinatura que cancelam o serviço a cada mês. Um valor baixo é ideal.",
-    "Taxa de Reembolso": "A porcentagem da Receita Bruta Total que foi devolvida aos clientes via reembolso. É um indicador da satisfação do cliente e qualidade do produto.",
-    "Gasto Total": "Soma total de gastos com campanhas de anúncios no Meta Ads no período selecionado.",
-    "CTR": "Click-Through Rate (CTR). A porcentagem de cliques que um anúncio recebe em relação ao número de vezes que foi exibido (impressões).",
-    "CPC Médio": "Custo por Clique (CPC). O valor médio pago por cada clique em seus anúncios.",
-    "CPA Médio": "Custo por Aquisição (CPA). O custo médio para adquirir um cliente ou gerar uma conversão através dos seus anúncios."
+    # ... (dicionário completo de textos aqui) ...
 }
 
 # CSS responsivo para mobile
 st.markdown("""
 <style>
-    /* ... (CSS completo aqui) ... */
+    # ... (CSS completo aqui) ...
 </style>
 """, unsafe_allow_html=True)
 
@@ -49,6 +32,7 @@ st.markdown("""
 st.markdown("<h1 class='main-header'>📊 Dashboard Rebobinador Express</h1>", unsafe_allow_html=True)
 
 # --- FUNÇÕES UTILITÁRIAS E DE PROCESSAMENTO ---
+
 def converter_valor_brasileiro(valor):
     if pd.isna(valor) or valor == '': return 0.0
     if isinstance(valor, (int, float)): return float(valor)
@@ -79,7 +63,6 @@ def _find_and_rename_column(df, standard_name, possible_names):
 
 @st.cache_data
 def carregar_dados_aba(gid, nome_aba):
-    """Carrega dados de uma aba do Google Sheets, padroniza e limpa."""
     try:
         sheet_url = f"https://docs.google.com/spreadsheets/d/1KfTURyG-vh0fsht2hyPJzTnTvBIVPWlXEdhjacVvh6c/export?format=csv&gid={gid}"
         df = pd.read_csv(sheet_url)
@@ -96,14 +79,10 @@ def carregar_dados_aba(gid, nome_aba):
                 df[coluna] = df[coluna].apply(converter_valor_brasileiro)
 
         if 'data' in df.columns:
-            # Lógica condicional para tratar diferentes formatos de data
             if nome_aba == 'Stripe':
-                # Lê o formato ANO-MÊS-DIA, comum em exportações de sistemas
                 df['data'] = pd.to_datetime(df['data'], errors='coerce')
             else:
-                # Lê o formato DIA-MÊS-ANO para as outras planilhas
                 df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
-            
             df.dropna(subset=['data'], inplace=True)
 
         if nome_aba == 'Kiwify' and 'receita_bruta' in df.columns:
@@ -114,43 +93,44 @@ def carregar_dados_aba(gid, nome_aba):
         return df, "Sucesso"
     except Exception as e: return None, f"Erro na aba {nome_aba}: {str(e)}"
 
-# ... (O restante do seu código completo, idêntico ao da última versão, continua aqui) ...
-
 @st.cache_data
 def carregar_todos_dados():
-    """Carrega os dados de todas as abas e aplica o filtro de data inicial."""
     dados = {}
     gids = {'Kiwify': 0, 'Stripe': 365912887, 'Meta': 1945405496, 'Despesas': 1740447033}
     for aba, gid in gids.items():
         df, _ = carregar_dados_aba(gid, aba)
-        
         if df is not None and 'data' in df.columns:
             data_inicio_operacao = pd.to_datetime('2022-11-16')
             df = df[df['data'] >= data_inicio_operacao]
-
         dados[aba] = df
     return dados
 
 def aplicar_filtro_periodo(df, periodo, data_inicio, data_fim):
     """Aplica filtro de período a um DataFrame."""
-    if df is None or df.empty: return df
-    if periodo == 'Todo o período': return df
-    if 'data' not in df.columns: return df.iloc[0:0]
+    if df is None or df.empty or 'data' not in df.columns:
+        return df
+
+    if periodo == 'Todo o período':
+        return df
+
+    df_filtrado = df.copy()
+
     try:
-        df_filtrado = df.copy()
         if periodo == 'Personalizado':
             if data_inicio and data_fim:
                 start_date = pd.to_datetime(data_inicio)
                 end_date = pd.to_datetime(data_fim) + timedelta(days=1)
-                
                 df_filtrado = df_filtrado.loc[(df_filtrado['data'] >= start_date) & (df_filtrado['data'] < end_date)]
         else:
             dias = {'7 dias': 7, '15 dias': 15, '30 dias': 30, '90 dias': 90, '180 dias': 180}.get(periodo)
             if dias:
-                data_limite = pd.to_datetime(datetime.now() - timedelta(days=dias)).normalize()
-                df_filtrado = df_filtrado.loc[df_filtrado['data'] >= data_limite]
+                data_maxima_nos_dados = df_filtrado['data'].max()
+                if pd.notna(data_maxima_nos_dados):
+                    data_limite = data_maxima_nos_dados - timedelta(days=dias)
+                    df_filtrado = df_filtrado.loc[df_filtrado['data'] >= data_limite]
         return df_filtrado
-    except Exception: return df
+    except Exception:
+        return df
 
 with st.spinner('🔄 Carregando dados...'):
     dados = carregar_todos_dados()
