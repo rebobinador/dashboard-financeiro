@@ -240,15 +240,50 @@ def calcular_metricas(dados_filtrados, dados_completos):
     total_clientes = metricas['vendas_kiwify'] + metricas['assinaturas_stripe']
     metricas['cac'] = metricas['gastos_meta'] / total_clientes if total_clientes > 0 else 0.0
     
+    # Cálculo das métricas de assinatura (MRR, ARR, ARPA, Churn Rate)
     metricas.update({'mrr': 0.0, 'arr': 0.0, 'arpa': 0.0, 'churn_rate': 0.0})
-    if stripe_df is not None and not stripe_df.empty and 'status_assinatura' in stripe_df.columns:
-        ativas = stripe_df[stripe_df['status_assinatura'].str.lower().isin(['active', 'ativa'])]
-        clientes_ativos = len(ativas)
-        if clientes_ativos > 0:
-            metricas['mrr'] = ativas['receita_bruta'].sum() if 'receita_bruta' in ativas.columns else 0.0
-            metricas['arr'] = metricas['mrr'] * 12
-            metricas['arpa'] = metricas['mrr'] / clientes_ativos
-            metricas['churn_rate'] = 5.0
+    
+    # Para calcular MRR corretamente, precisamos usar dados completos do Stripe, não apenas filtrados
+    stripe_completo = dados_completos.get('Stripe') if dados_completos else None
+    
+    if stripe_completo is not None and not stripe_completo.empty:
+        # Calcular MRR baseado em todas as assinaturas ativas (dados completos)
+        if 'status_assinatura' in stripe_completo.columns:
+            ativas_completo = stripe_completo[stripe_completo['status_assinatura'].str.lower().isin(['active', 'ativa', 'trialing'])]
+            clientes_ativos_total = len(ativas_completo)
+            
+            if clientes_ativos_total > 0:
+                # MRR = soma da receita mensal de todas as assinaturas ativas
+                mrr_total = 0.0
+                for _, row in ativas_completo.iterrows():
+                    valor = row.get('receita_bruta', 0)
+                    plano = str(row.get('nome_plano', '')).lower()
+                    
+                    # Converter valores anuais para mensais
+                    if 'anual' in plano or 'yearly' in plano or 'year' in plano:
+                        mrr_total += valor / 12
+                    else:
+                        mrr_total += valor
+                
+                metricas['mrr'] = mrr_total
+                metricas['arr'] = mrr_total * 12
+                metricas['arpa'] = mrr_total / clientes_ativos_total if clientes_ativos_total > 0 else 0.0
+                
+                # Churn rate estimado (pode ser ajustado conforme dados reais)
+                metricas['churn_rate'] = 5.0
+        
+        # Se não temos dados de status, usar uma estimativa baseada na receita do período filtrado
+        elif stripe_df is not None and not stripe_df.empty and 'receita_bruta' in stripe_df.columns:
+            receita_periodo = stripe_df['receita_bruta'].sum()
+            transacoes_periodo = len(stripe_df)
+            
+            if transacoes_periodo > 0:
+                # Estimativa de MRR baseada na receita do período
+                ticket_medio = receita_periodo / transacoes_periodo
+                metricas['mrr'] = ticket_medio * transacoes_periodo
+                metricas['arr'] = metricas['mrr'] * 12
+                metricas['arpa'] = ticket_medio
+                metricas['churn_rate'] = 3.0  # Churn estimado mais baixo
 
     metricas['ltv'] = 0.0
     if metricas['arpa'] > 0 and metricas['churn_rate'] > 0:
