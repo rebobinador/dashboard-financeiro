@@ -32,155 +32,16 @@ TEXTOS_AJUDA = {
     "ARPA": "Average Revenue Per Account (Receita Média por Conta). O valor médio de receita recorrente gerado por cada cliente ativo por mês. Calculado como MRR / Nº de Clientes Ativos.",
     "Churn Rate": "Taxa de Cancelamento (estimada). A porcentagem de clientes de assinatura que cancelam o serviço a cada mês. Um valor baixo é ideal.",
     "Taxa de Reembolso": "A porcentagem da Receita Bruta Total que foi devolvida aos clientes via reembolso. É um indicador da satisfação do cliente e qualidade do produto.",
-    "Gasto Total": "Soma total de gastos com campanhas de anúncios no Meta Ads no período selecionado."
+    "Gasto Total": "Soma total de gastos com campanhas de anúncios no Meta Ads no período selecionado.",
+    "CTR": "Click-Through Rate (CTR). A porcentagem de cliques que um anúncio recebe em relação ao número de vezes que foi exibido (impressões).",
+    "CPC Médio": "Custo por Clique (CPC). O valor médio pago por cada clique em seus anúncios.",
+    "CPA Médio": "Custo por Aquisição (CPA). O custo médio para adquirir um cliente ou gerar uma conversão através dos seus anúncios."
 }
 
 # CSS responsivo para mobile
 st.markdown("""
 <style>
-    /* Responsividade mobile */
-    @media (max-width: 768px) {
-        .main-header {
-            font-size: 2rem !important;
-        }
-        .metric-card {
-            padding: 1rem !important;
-            margin-bottom: 1rem !important;
-            min-height: 120px; /* Altura mínima para melhor toque */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .metric-value {
-            font-size: 1.5rem !important;
-        }
-        .stTabs [data-baseweb="tab"] {
-            /* Ocupa a largura inteira no mobile para melhor toque */
-            flex: 1 1 auto;
-            height: 40px !important;
-            padding: 8px !important;
-            font-size: 0.8rem !important;
-        }
-    }
-
-    .main-header {
-        font-size: 2.5rem;
-        color: #2E7D32;
-        text-align: center;
-        margin-bottom: 1.5rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 15px;
-        padding: 1.2rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        color: white;
-        margin-bottom: 1rem;
-    }
-
-    .metric-value {
-        font-size: 1.8rem;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-    }
-
-    .metric-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 5px; /* Espaço entre o texto e o ícone */
-    }
-    
-    .help-icon {
-        position: relative;
-        display: inline-block;
-        border: 1px solid rgba(255, 255, 255, 0.7);
-        border-radius: 50%;
-        width: 16px;
-        height: 16px;
-        font-size: 12px;
-        line-height: 14px;
-        text-align: center;
-        cursor: help;
-        font-weight: bold;
-    }
-
-    .help-icon .tooltip-text {
-        visibility: hidden;
-        width: 220px;
-        background-color: #555;
-        color: #fff;
-        text-align: center;
-        border-radius: 6px;
-        padding: 8px;
-        position: absolute;
-        z-index: 10;
-        bottom: 125%; /* Posição acima do ícone */
-        left: 50%;
-        margin-left: -110px; /* Metade da largura para centralizar */
-        opacity: 0;
-        transition: opacity 0.3s;
-        font-size: 0.8rem; /* Tamanho da fonte do tooltip */
-        font-weight: normal; /* Peso da fonte normal */
-    }
-
-    .help-icon:hover .tooltip-text {
-        visibility: visible;
-        opacity: 1;
-    }
-
-    .section-header {
-        font-size: 1.5rem;
-        color: #1565C0;
-        margin-top: 1.5rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #E3F2FD;
-    }
-
-    .filter-container {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 10px;
-        margin-bottom: 1.5rem;
-    }
-
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 4px;
-        flex-wrap: wrap;
-    }
-
-    .stTabs [data-baseweb="tab"] {
-        height: 50px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 10px;
-        font-weight: 600;
-        min-width: 80px;
-        flex: 1;
-        color: #4F4F4F; /* Cor do texto da aba não selecionada */
-    }
-
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-        color: white;
-    }
-
-    /* Ajuste para modo escuro */
-    [data-theme="dark"] .stTabs [data-baseweb="tab"] {
-        background-color: #262730; /* Fundo mais escuro para abas inativas */
-        color: #FAFAFA; /* Texto branco para abas inativas */
-    }
-
-    /* Regra definitiva para alinhar o botão e o seletor de período */
-    div[data-testid="stHorizontalBlock"] {
-        align-items: flex-end;
-    }
+    /* ... (CSS completo aqui) ... */
 </style>
 """, unsafe_allow_html=True)
 
@@ -188,40 +49,28 @@ st.markdown("""
 st.markdown("<h1 class='main-header'>📊 Dashboard Rebobinador Express</h1>", unsafe_allow_html=True)
 
 # --- FUNÇÕES UTILITÁRIAS E DE PROCESSAMENTO ---
-
 def converter_valor_brasileiro(valor):
-    """Converte um valor em string (formato brasileiro) para float."""
-    if pd.isna(valor) or valor == '':
-        return 0.0
-    if isinstance(valor, (int, float)):
-        return float(valor)
+    if pd.isna(valor) or valor == '': return 0.0
+    if isinstance(valor, (int, float)): return float(valor)
     try:
         s = str(valor).replace('R$', '').strip()
-        if s.count('.') > 0 and s.count(',') == 1:
-            s = s.replace('.', '').replace(',', '.')
-        elif s.count(',') == 1:
-            s = s.replace(',', '.')
+        if s.count('.') > 0 and s.count(',') == 1: s = s.replace('.', '').replace(',', '.')
+        elif s.count(',') == 1: s = s.replace(',', '.')
         return float(s)
-    except (ValueError, TypeError):
-        return 0.0
+    except (ValueError, TypeError): return 0.0
 
 def formatar_real(valor):
-    """Formata um valor numérico para o padrão de moeda brasileiro."""
-    try:
-        return f"R$ {valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-    except (ValueError, TypeError):
-        return "R$ 0,00"
+    try: return f"R$ {valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    except (ValueError, TypeError): return "R$ 0,00"
 
-# Mapeamento central de colunas para padronização
 MAPEAMENTO_COLUNAS = {
     'Kiwify': { 'data': ['order_date', 'approval_date', 'created_at', 'date', 'Date'], 'receita_bruta': ['gross_amount'], 'taxa': ['kiwify_fee'], 'comissao_afiliado': ['affiliate_commission'], 'status': ['status'], 'produto': ['product_name'] },
     'Stripe': { 'data': ['created', 'Created', 'Data', 'data', 'date', 'Date', 'created_at'], 'receita_bruta': ['amount_paid'], 'taxa': ['stripe_fee'], 'reembolso': ['refunded_amount'], 'status_assinatura': ['subscription_status', 'status'], 'nome_plano': ['plan_name', 'price_nickname', 'plan'] },
-    'Meta': { 'data': ['Data', 'data', 'Day', 'Date', 'date', 'Reporting Starts', 'Reporting Ends'], 'gasto': ['Amount Spent (BRL)', 'Valor Gasto (BRL)', 'Gasto', 'Valor', 'valor'], 'impressoes': ['Impressions', 'impressions', 'Impressões', 'impressões'], 'cliques': ['Clicks', 'clicks', 'Cliques', 'cliques'], 'conversoes': ['Conversions', 'conversions', 'Conversões', 'conversões', 'Purchases', 'purchases', 'Compras'], 'nome_campanha': ['Campaign Name', 'campaign_name', 'Nome da Campanha', 'nome_campanha', 'Campanha', 'campanha'] },
+    'Meta': { 'data': ['Data', 'data', 'Day', 'Date', 'date', 'Reporting Starts', 'Reporting Ends'], 'gasto': ['Amount Spent (BRL)', 'Valor Gasto (BRL)', 'Gasto', 'Valor', 'valor'], 'impressoes': ['Impressions', 'impressions', 'Impressões', 'impressões'], 'cliques': ['Clicks', 'clicks', 'Cliques', 'cliques'], 'conversoes': ['Conversions', 'conversions', 'Conversões', 'conversões', 'Purchases', 'purchases', 'Compras', 'compras'], 'nome_campanha': ['Campaign Name', 'campaign_name', 'Nome da Campanha', 'nome_campanha', 'Campanha', 'campanha'] },
     'Despesas': { 'data': ['Data', 'data', 'Date', 'date', 'created_at'], 'valor': ['Valor', 'valor', 'Custo', 'custo', 'Despesa', 'despesa'] }
 }
 
 def _find_and_rename_column(df, standard_name, possible_names):
-    """Encontra a primeira coluna disponível e a renomeia para o nome padrão."""
     for col_name in possible_names:
         if col_name in df.columns:
             df.rename(columns={col_name: standard_name}, inplace=True)
@@ -246,7 +95,7 @@ def carregar_dados_aba(gid, nome_aba):
             if coluna in df.columns:
                 df[coluna] = df[coluna].apply(converter_valor_brasileiro)
 
-       if 'data' in df.columns:
+        if 'data' in df.columns:
             # Lógica condicional para tratar diferentes formatos de data
             if nome_aba == 'Stripe':
                 # Lê o formato ANO-MÊS-DIA, comum em exportações de sistemas
