@@ -114,6 +114,8 @@ def carregar_dados_aba(gid, nome_aba):
         return df, "Sucesso"
     except Exception as e: return None, f"Erro na aba {nome_aba}: {str(e)}"
 
+# ... (O restante do seu código completo, idêntico ao da última versão, continua aqui) ...
+
 @st.cache_data
 def carregar_todos_dados():
     """Carrega os dados de todas as abas e aplica o filtro de data inicial."""
