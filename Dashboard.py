@@ -105,6 +105,56 @@ def carregar_todos_dados():
         dados[aba] = df
     return dados
 
+def aplicar_filtro_periodo(df, periodo, data_inicio, data_fim, data_maxima_geral):
+    """Aplica filtro de período a um DataFrame."""
+    if df is None or df.empty or 'data' not in df.columns:
+        return df
+
+    if periodo == 'Todo o período':
+        return df
+
+    df_filtrado = df.copy()
+
+    try:
+        if periodo == 'Personalizado':
+            if data_inicio and data_fim:
+                start_date = pd.to_datetime(data_inicio)
+                end_date = pd.to_datetime(data_fim) + timedelta(days=1)
+                df_filtrado = df_filtrado.loc[(df_filtrado['data'] >= start_date) & (df_filtrado['data'] < end_date)]
+        else:
+            dias = {'7 dias': 7, '15 dias': 15, '30 dias': 30, '90 dias': 90, '180 dias': 180}.get(periodo)
+            if dias and pd.notna(data_maxima_geral):
+                data_limite = data_maxima_geral - timedelta(days=dias)
+                df_filtrado = df_filtrado.loc[df_filtrado['data'] >= data_limite]
+        return df_filtrado
+    except Exception:
+        return df
+
+with st.spinner('🔄 Carregando dados...'):
+    dados = carregar_todos_dados()
+
+with st.container(border=True):
+    st.markdown("### ⏱️ Filtro de Período")
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        opcoes_periodo = ['7 dias', '15 dias', '30 dias', '90 dias', '180 dias', 'Todo o período', 'Personalizado']
+        periodo_selecionado = st.selectbox("Selecione o período:", opcoes_periodo, index=5, key="periodo_select")
+    with col2:
+        if st.button("🔄 Atualizar Dados", key="refresh_btn", use_container_width=True):
+            st.cache_data.clear(); st.rerun()
+    data_inicio_personalizada, data_fim_personalizada = None, None
+    if periodo_selecionado == 'Personalizado':
+        c1, c2 = st.columns(2)
+        with c1: data_inicio_personalizada = st.date_input("Data inicial:", datetime(2022, 11, 16).date(), format="DD/MM/YYYY")
+        with c2: data_fim_personalizada = st.date_input("Data final:", datetime.now().date(), format="DD/MM/YYYY")
+
+# Lógica de filtragem corrigida
+todas_as_datas = pd.concat([df['data'] for df in dados.values() if df is not None and 'data' in
+            data_inicio_operacao = pd.to_datetime('2022-11-16')
+            df = df[df['data'] >= data_inicio_operacao]
+        dados[aba] = df
+    return dados
+
 def aplicar_filtro_periodo(df, periodo, data_inicio, data_fim):
     """Aplica filtro de período a um DataFrame."""
     if df is None or df.empty or 'data' not in df.columns:
