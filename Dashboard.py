@@ -18,13 +18,26 @@ st.set_page_config(
 TEXTOS_AJUDA = {
     "Receita Total": "Soma de todas as vendas brutas (antes de taxas e comissões) de todas as plataformas.",
     "Receita Líquida": "Receita Total menos os custos diretos da venda (taxas da plataforma, comissões). É o valor que efetivamente entra no caixa da empresa.",
-    # ... (dicionário completo de textos aqui) ...
+    "Despesas Totais": "Soma de todas as despesas, incluindo gastos com anúncios e despesas operacionais.",
+    "Lucro Líquido": "Receita Líquida menos Despesas Totais. Representa o lucro real do negócio após todos os custos.",
+    "Vendas Kiwify": "Número total de vendas realizadas na plataforma Kiwify no período selecionado.",
+    "Transações Stripe": "Número total de transações processadas pelo Stripe no período selecionado.",
+    "Ticket Médio": "Valor médio gasto por cliente em uma única compra (Receita Total ÷ Número de Transações).",
+    "Margem de Lucro": "Percentual do lucro em relação à receita (Lucro Líquido ÷ Receita Total × 100%).",
+    "LTV": "Lifetime Value - Valor médio que um cliente gera durante todo seu relacionamento com a empresa.",
+    "CAC": "Custo de Aquisição de Cliente - Quanto se gasta em média para adquirir um novo cliente.",
+    "MRR": "Monthly Recurring Revenue - Receita recorrente mensal gerada por assinaturas.",
+    "ARR": "Annual Recurring Revenue - Receita recorrente anual (MRR × 12).",
+    "ARPA": "Average Revenue Per Account - Receita média por conta/assinatura ativa.",
+    "Churn Rate": "Taxa de cancelamento - Percentual de clientes que cancelam assinaturas em um período.",
+    "LTV/CAC Ratio": "Relação entre o valor do cliente ao longo do tempo e o custo para adquiri-lo. Ideal: > 3.",
+    "Taxa de Reembolso": "Percentual de vendas que resultaram em reembolso (Valor Reembolsado ÷ Receita Total × 100%)."
 }
 
 # CSS responsivo para mobile
 st.markdown("""
 <style>
-    # ... (CSS completo aqui) ...
+    /* Estilos CSS aqui */
 </style>
 """, unsafe_allow_html=True)
 
@@ -78,14 +91,64 @@ def carregar_dados_aba(gid, nome_aba):
             if coluna in df.columns:
                 df[coluna] = df[coluna].apply(converter_valor_brasileiro)
 
-       # CÓDIGO CORRIGIDO (ALTERNATIVA)
-if 'data' in df.columns:
-    if nome_aba == 'Stripe':
-        # Correção: Adicionar dayfirst=True para entender o formato dd/mm/yyyy
-        df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
-    else:
-        df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
-    df.dropna(subset=['data'], inplace=True)
+        if 'data' in df.columns:
+            # Tratamento flexível para datas
+            try:
+                # Para o Stripe, tentamos vários formatos de data
+                if nome_aba == 'Stripe':
+                    # Primeiro, tente converter diretamente (formato padrão)
+                    try:
+                        df['data'] = pd.to_datetime(df['data'], errors='coerce')
+                    except:
+                        pass
+                    
+                    # Se ainda tiver valores NaT, tente outros formatos
+                    if df['data'].isna().any():
+                        # Tente interpretar como timestamp Unix (comum no Stripe)
+                        try:
+                            mask_nan = df['data'].isna()
+                            df.loc[mask_nan, 'data'] = pd.to_datetime(df.loc[mask_nan, 'data'].astype(float), unit='s', errors='coerce')
+                        except:
+                            pass
+                    
+                    # Se ainda tiver valores NaT, tente formatos específicos
+                    if df['data'].isna().any():
+                        formatos = ['%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y', '%d/%m/%Y %H:%M:%S', '%Y-%m-%d %H:%M:%S']
+                        for formato in formatos:
+                            try:
+                                mask_nan = df['data'].isna()
+                                df.loc[mask_nan, 'data'] = pd.to_datetime(df.loc[mask_nan, 'data'], format=formato, errors='coerce')
+                            except:
+                                continue
+                else:
+                    # Para outras abas, assumimos formato brasileiro (dia/mês/ano)
+                    df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
+                
+                # Se ainda houver valores NaT, tente converter como texto para data
+                if df['data'].isna().any():
+                    try:
+                        mask_nan = df['data'].isna()
+                        # Tente extrair apenas a data de strings mais complexas
+                        data_texto = df.loc[mask_nan, 'data'].astype(str)
+                        # Tente encontrar padrões de data no texto
+                        for i, texto in enumerate(data_texto):
+                            # Tente extrair padrões comuns de data do texto
+                            import re
+                            # Procure por padrões como DD/MM/YYYY ou YYYY-MM-DD
+                            padrao_data = re.search(r'(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}[/-]\d{1,2}[/-]\d{1,2})', texto)
+                            if padrao_data:
+                                data_texto.iloc[i] = padrao_data.group(0)
+                        
+                        df.loc[mask_nan, 'data'] = pd.to_datetime(data_texto, errors='coerce', dayfirst=True)
+                    except:
+                        pass
+            except Exception as e:
+                st.warning(f"Erro ao processar datas na aba {nome_aba}: {str(e)}")
+                # Em caso de erro, mantenha as datas como texto
+                df['data'] = df['data'].astype(str)
+            
+            # Remova linhas com datas inválidas
+            df.dropna(subset=['data'], inplace=True)
 
         if nome_aba == 'Kiwify' and 'receita_bruta' in df.columns:
             df['receita_liquida'] = df['receita_bruta'] - df.get('taxa', 0) - df.get('comissao_afiliado', 0)
@@ -100,60 +163,20 @@ def carregar_todos_dados():
     dados = {}
     gids = {'Kiwify': 0, 'Stripe': 365912887, 'Meta': 1945405496, 'Despesas': 1740447033}
     for aba, gid in gids.items():
-        df, _ = carregar_dados_aba(gid, aba)
+        df, mensagem = carregar_dados_aba(gid, aba)
         if df is not None and 'data' in df.columns:
             data_inicio_operacao = pd.to_datetime('2022-11-16')
-            df = df[df['data'] >= data_inicio_operacao]
-        dados[aba] = df
-    return dados
-
-def aplicar_filtro_periodo(df, periodo, data_inicio, data_fim, data_maxima_geral):
-    """Aplica filtro de período a um DataFrame."""
-    if df is None or df.empty or 'data' not in df.columns:
-        return df
-
-    if periodo == 'Todo o período':
-        return df
-
-    df_filtrado = df.copy()
-
-    try:
-        if periodo == 'Personalizado':
-            if data_inicio and data_fim:
-                start_date = pd.to_datetime(data_inicio)
-                end_date = pd.to_datetime(data_fim) + timedelta(days=1)
-                df_filtrado = df_filtrado.loc[(df_filtrado['data'] >= start_date) & (df_filtrado['data'] < end_date)]
-        else:
-            dias = {'7 dias': 7, '15 dias': 15, '30 dias': 30, '90 dias': 90, '180 dias': 180}.get(periodo)
-            if dias and pd.notna(data_maxima_geral):
-                data_limite = data_maxima_geral - timedelta(days=dias)
-                df_filtrado = df_filtrado.loc[df_filtrado['data'] >= data_limite]
-        return df_filtrado
-    except Exception:
-        return df
-
-with st.spinner('🔄 Carregando dados...'):
-    dados = carregar_todos_dados()
-
-with st.container(border=True):
-    st.markdown("### ⏱️ Filtro de Período")
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        opcoes_periodo = ['7 dias', '15 dias', '30 dias', '90 dias', '180 dias', 'Todo o período', 'Personalizado']
-        periodo_selecionado = st.selectbox("Selecione o período:", opcoes_periodo, index=5, key="periodo_select")
-    with col2:
-        if st.button("🔄 Atualizar Dados", key="refresh_btn", use_container_width=True):
-            st.cache_data.clear(); st.rerun()
-    data_inicio_personalizada, data_fim_personalizada = None, None
-    if periodo_selecionado == 'Personalizado':
-        c1, c2 = st.columns(2)
-        with c1: data_inicio_personalizada = st.date_input("Data inicial:", datetime(2022, 11, 16).date(), format="DD/MM/YYYY")
-        with c2: data_fim_personalizada = st.date_input("Data final:", datetime.now().date(), format="DD/MM/YYYY")
-
-# Lógica de filtragem corrigida
-todas_as_datas = pd.concat([df['data'] for df in dados.values() if df is not None and 'data' in
-            data_inicio_operacao = pd.to_datetime('2022-11-16')
-            df = df[df['data'] >= data_inicio_operacao]
+            # Certifique-se de que a coluna data é datetime antes de filtrar
+            if pd.api.types.is_datetime64_any_dtype(df['data']):
+                df = df[df['data'] >= data_inicio_operacao]
+            else:
+                # Se não for datetime, tente converter novamente
+                try:
+                    df['data'] = pd.to_datetime(df['data'], errors='coerce')
+                    df = df[df['data'] >= data_inicio_operacao]
+                except:
+                    # Se falhar, mantenha todos os dados
+                    pass
         dados[aba] = df
     return dados
 
@@ -168,6 +191,11 @@ def aplicar_filtro_periodo(df, periodo, data_inicio, data_fim):
     df_filtrado = df.copy()
 
     try:
+        # Certifique-se de que a coluna data é datetime antes de filtrar
+        if not pd.api.types.is_datetime64_any_dtype(df_filtrado['data']):
+            df_filtrado['data'] = pd.to_datetime(df_filtrado['data'], errors='coerce')
+            df_filtrado.dropna(subset=['data'], inplace=True)
+            
         if periodo == 'Personalizado':
             if data_inicio and data_fim:
                 start_date = pd.to_datetime(data_inicio)
@@ -181,7 +209,8 @@ def aplicar_filtro_periodo(df, periodo, data_inicio, data_fim):
                     data_limite = data_maxima_nos_dados - timedelta(days=dias)
                     df_filtrado = df_filtrado.loc[df_filtrado['data'] >= data_limite]
         return df_filtrado
-    except Exception:
+    except Exception as e:
+        st.warning(f"Erro ao aplicar filtro de período: {str(e)}")
         return df
 
 with st.spinner('🔄 Carregando dados...'):
@@ -352,9 +381,7 @@ with col4:
     taxa_reembolso = metricas.get('taxa_reembolso', 0)
     cor_reembolso = "#4CAF50" if taxa_reembolso <= 5 else "#FF9800" if taxa_reembolso <= 10 else "#F44336"
     criar_cartao_metrica("📉 Taxa de Reembolso", f"{taxa_reembolso:.1f}%", TEXTOS_AJUDA["Taxa de Reembolso"], color=cor_reembolso)
-
 tab_geral, tab_kiwify, tab_stripe, tab_meta, tab_despesas, tab_dre = st.tabs(["📊 Geral", "💰 Kiwify", "💳 Stripe", "📱 Meta", "💸 Despesas", "📈 DRE"])
-
 with tab_geral:
     st.markdown("<h3>📊 Visão Geral Consolidada</h3>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
