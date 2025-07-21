@@ -18,26 +18,324 @@ st.set_page_config(
 TEXTOS_AJUDA = {
     "Receita Total": "Soma de todas as vendas brutas (antes de taxas e comissões) de todas as plataformas.",
     "Receita Líquida": "Receita Total menos os custos diretos da venda (taxas da plataforma, comissões). É o valor que efetivamente entra no caixa da empresa.",
-    "Despesas Totais": "Soma de todas as despesas, incluindo gastos com anúncios e despesas operacionais.",
-    "Lucro Líquido": "Receita Líquida menos Despesas Totais. Representa o lucro real do negócio após todos os custos.",
-    "Vendas Kiwify": "Número total de vendas realizadas na plataforma Kiwify no período selecionado.",
-    "Transações Stripe": "Número total de transações processadas pelo Stripe no período selecionado.",
-    "Ticket Médio": "Valor médio gasto por cliente em uma única compra (Receita Total ÷ Número de Transações).",
-    "Margem de Lucro": "Percentual do lucro em relação à receita (Lucro Líquido ÷ Receita Total × 100%).",
-    "LTV": "Lifetime Value - Valor médio que um cliente gera durante todo seu relacionamento com a empresa.",
-    "CAC": "Custo de Aquisição de Cliente - Quanto se gasta em média para adquirir um novo cliente.",
-    "MRR": "Monthly Recurring Revenue - Receita recorrente mensal gerada por assinaturas.",
-    "ARR": "Annual Recurring Revenue - Receita recorrente anual (MRR × 12).",
-    "ARPA": "Average Revenue Per Account - Receita média por conta/assinatura ativa.",
-    "Churn Rate": "Taxa de cancelamento - Percentual de clientes que cancelam assinaturas em um período.",
-    "LTV/CAC Ratio": "Relação entre o valor do cliente ao longo do tempo e o custo para adquiri-lo. Ideal: > 3.",
-    "Taxa de Reembolso": "Percentual de vendas que resultaram em reembolso (Valor Reembolsado ÷ Receita Total × 100%)."
+    "Despesas Totais": "Soma de todos os custos para operar o negócio no período, incluindo gastos com anúncios (Meta) e outras despesas gerais.",
+    "Lucro Líquido": "Receita Líquida menos as Despesas Totais. Mostra o resultado financeiro final da empresa no período.",
+    "Vendas Kiwify": "Número total de vendas de produtos únicos (não recorrentes) realizadas através da plataforma Kiwify.",
+    "Transações Stripe": "Número total de transações de assinaturas (recorrentes) realizadas através da plataforma Stripe.",
+    "Ticket Médio": "Valor médio de cada transação. É calculado dividindo a Receita Total pelo número total de transações (Kiwify + Stripe).",
+    "Margem de Lucro": "A porcentagem da Receita Total que se transformou em Lucro Líquido. Indica a eficiência e rentabilidade do negócio.",
+    "LTV": "Lifetime Value (Valor Vitalício do Cliente). Uma previsão de quanta receita líquida um cliente médio irá gerar durante todo o seu relacionamento com a empresa.",
+    "MRR": "Monthly Recurring Revenue (Receita Recorrente Mensal). A receita previsível que sua empresa gera a cada mês a partir das assinaturas ativas no Stripe.",
+    "ARR": "Annual Recurring Revenue (Receita Recorrente Anual). Uma projeção da sua receita recorrente para um ano, calculada como MRR x 12.",
+    "LTV/CAC Ratio": "A proporção entre o LTV e o CAC. Um valor saudável (geralmente acima de 3x) indica que o valor gerado por um cliente é maior que o custo para adquiri-lo.",
+    "CAC": "Custo de Aquisição de Cliente. O valor total gasto em marketing (Meta Ads) dividido pelo número de novos clientes adquiridos no período.",
+    "ARPA": "Average Revenue Per Account (Receita Média por Conta). O valor médio de receita recorrente gerado por cada cliente ativo por mês. Calculado como MRR / Nº de Clientes Ativos.",
+    "Churn Rate": "Taxa de Cancelamento (estimada). A porcentagem de clientes de assinatura que cancelam o serviço a cada mês. Um valor baixo é ideal.",
+    "Taxa de Reembolso": "A porcentagem da Receita Bruta Total que foi devolvida aos clientes via reembolso. É um indicador da satisfação do cliente e qualidade do produto.",
+    "Gasto Total": "Soma total de gastos com campanhas de anúncios no Meta Ads no período selecionado."
 }
 
-# CSS responsivo para mobile
+# CSS avançado com design moderno e responsivo
 st.markdown("""
 <style>
-    /* Estilos CSS aqui */
+    /* Importar fontes do Google */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    /* Variáveis CSS para tema */
+    :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --info-color: #3b82f6;
+        --dark-color: #1f2937;
+        --light-color: #f8fafc;
+        --border-radius: 12px;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Reset e base */
+    * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Responsividade mobile */
+    @media (max-width: 768px) {
+        .main-header {
+            font-size: 1.8rem !important;
+            margin-bottom: 1rem !important;
+        }
+        .metric-card {
+            padding: 1rem !important;
+            margin-bottom: 0.8rem !important;
+            min-height: 100px;
+        }
+        .metric-value {
+            font-size: 1.3rem !important;
+        }
+        .metric-label {
+            font-size: 0.8rem !important;
+        }
+        .stTabs [data-baseweb="tab"] {
+            flex: 1 1 auto;
+            height: 45px !important;
+            padding: 8px 4px !important;
+            font-size: 0.75rem !important;
+        }
+        .section-header {
+            font-size: 1.2rem !important;
+            margin-top: 1rem !important;
+        }
+    }
+
+    /* Header principal */
+    .main-header {
+        font-size: 2.8rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+        margin-bottom: 2rem;
+        letter-spacing: -0.02em;
+    }
+
+    /* Cards de métricas modernos */
+    .metric-card {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-lg);
+        text-align: center;
+        color: white;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+        pointer-events: none;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .metric-label {
+        font-size: 0.9rem;
+        opacity: 0.95;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        font-weight: 500;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Tooltip melhorado */
+    .help-icon {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1.5px solid rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: help;
+        transition: all 0.2s ease;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .help-icon:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+    }
+
+    .help-icon .tooltip-text {
+        visibility: hidden;
+        width: 280px;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(10px);
+        color: #fff;
+        text-align: left;
+        border-radius: 8px;
+        padding: 12px;
+        position: absolute;
+        z-index: 1000;
+        bottom: 130%;
+        left: 50%;
+        margin-left: -140px;
+        opacity: 0;
+        transition: all 0.3s ease;
+        font-size: 0.8rem;
+        font-weight: 400;
+        line-height: 1.4;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .help-icon .tooltip-text::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+    }
+
+    .help-icon:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(-5px);
+    }
+
+    /* Headers de seção */
+    .section-header {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 3px solid var(--info-color);
+        position: relative;
+    }
+
+    .section-header::before {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+
+    /* Container de filtros */
+    .filter-container {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Tabs modernos */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 6px;
+        flex-wrap: wrap;
+        background: #f1f5f9;
+        padding: 6px;
+        border-radius: var(--border-radius);
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        height: 48px;
+        background: transparent;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-weight: 500;
+        min-width: 100px;
+        flex: 1;
+        color: #64748b;
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+    .stTabs [data-baseweb="tab"]:hover {
+        background: rgba(255, 255, 255, 0.7);
+        color: var(--dark-color);
+    }
+
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+    }
+
+    /* Modo escuro */
+    [data-theme="dark"] {
+        --light-color: #1e293b;
+        --dark-color: #f1f5f9;
+    }
+
+    [data-theme="dark"] .stTabs [data-baseweb="tab-list"] {
+        background: #334155;
+    }
+
+    [data-theme="dark"] .stTabs [data-baseweb="tab"] {
+        color: #cbd5e1;
+    }
+
+    [data-theme="dark"] .section-header {
+        color: var(--dark-color);
+    }
+
+    /* Animações */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .metric-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    /* Indicadores de status */
+    .status-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 6px;
+    }
+
+    .status-success { background-color: var(--success-color); }
+    .status-warning { background-color: var(--warning-color); }
+    .status-danger { background-color: var(--danger-color); }
+    .status-info { background-color: var(--info-color); }
+
+    /* Melhorias nos gráficos */
+    .js-plotly-plot {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -47,27 +345,38 @@ st.markdown("<h1 class='main-header'>📊 Dashboard Rebobinador Express</h1>", u
 # --- FUNÇÕES UTILITÁRIAS E DE PROCESSAMENTO ---
 
 def converter_valor_brasileiro(valor):
-    if pd.isna(valor) or valor == '': return 0.0
-    if isinstance(valor, (int, float)): return float(valor)
+    """Converte um valor em string (formato brasileiro) para float."""
+    if pd.isna(valor) or valor == '':
+        return 0.0
+    if isinstance(valor, (int, float)):
+        return float(valor)
     try:
         s = str(valor).replace('R$', '').strip()
-        if s.count('.') > 0 and s.count(',') == 1: s = s.replace('.', '').replace(',', '.')
-        elif s.count(',') == 1: s = s.replace(',', '.')
+        if s.count('.') > 0 and s.count(',') == 1:
+            s = s.replace('.', '').replace(',', '.')
+        elif s.count(',') == 1:
+            s = s.replace(',', '.')
         return float(s)
-    except (ValueError, TypeError): return 0.0
+    except (ValueError, TypeError):
+        return 0.0
 
 def formatar_real(valor):
-    try: return f"R$ {valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-    except (ValueError, TypeError): return "R$ 0,00"
+    """Formata um valor numérico para o padrão de moeda brasileiro."""
+    try:
+        return f"R$ {valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    except (ValueError, TypeError):
+        return "R$ 0,00"
 
+# Mapeamento central de colunas para padronização
 MAPEAMENTO_COLUNAS = {
     'Kiwify': { 'data': ['order_date', 'approval_date', 'created_at', 'date', 'Date'], 'receita_bruta': ['gross_amount'], 'taxa': ['kiwify_fee'], 'comissao_afiliado': ['affiliate_commission'], 'status': ['status'], 'produto': ['product_name'] },
     'Stripe': { 'data': ['created', 'Created', 'Data', 'data', 'date', 'Date', 'created_at'], 'receita_bruta': ['amount_paid'], 'taxa': ['stripe_fee'], 'reembolso': ['refunded_amount'], 'status_assinatura': ['subscription_status', 'status'], 'nome_plano': ['plan_name', 'price_nickname', 'plan'] },
-    'Meta': { 'data': ['Data', 'data', 'Day', 'Date', 'date', 'Reporting Starts', 'Reporting Ends'], 'gasto': ['Amount Spent (BRL)', 'Valor Gasto (BRL)', 'Gasto', 'Valor', 'valor'], 'impressoes': ['Impressions', 'impressions', 'Impressões', 'impressões'], 'cliques': ['Clicks', 'clicks', 'Cliques', 'cliques'], 'conversoes': ['Conversions', 'conversions', 'Conversões', 'conversões', 'Purchases', 'purchases', 'Compras', 'compras'], 'nome_campanha': ['Campaign Name', 'campaign_name', 'Nome da Campanha', 'nome_campanha', 'Campanha', 'campanha'] },
+    'Meta': { 'data': ['Data', 'data', 'Day', 'Date', 'date', 'Reporting Starts', 'Reporting Ends'], 'gasto': ['Amount Spent (BRL)', 'Valor Gasto (BRL)', 'Gasto', 'Valor', 'valor'], 'impressoes': ['Impressions', 'impressions', 'Impressões', 'impressões'], 'cliques': ['Clicks', 'clicks', 'Cliques', 'cliques'], 'conversoes': ['Conversions', 'conversions', 'Conversões', 'conversões', 'Purchases', 'purchases'], 'nome_campanha': ['Campaign Name', 'campaign_name', 'Nome da Campanha', 'nome_campanha', 'Campanha', 'campanha'] },
     'Despesas': { 'data': ['Data', 'data', 'Date', 'date', 'created_at'], 'valor': ['Valor', 'valor', 'Custo', 'custo', 'Despesa', 'despesa'] }
 }
 
 def _find_and_rename_column(df, standard_name, possible_names):
+    """Encontra a primeira coluna disponível e a renomeia para o nome padrão."""
     for col_name in possible_names:
         if col_name in df.columns:
             df.rename(columns={col_name: standard_name}, inplace=True)
@@ -76,6 +385,7 @@ def _find_and_rename_column(df, standard_name, possible_names):
 
 @st.cache_data
 def carregar_dados_aba(gid, nome_aba):
+    """Carrega dados de uma aba do Google Sheets, padroniza e limpa."""
     try:
         sheet_url = f"https://docs.google.com/spreadsheets/d/1KfTURyG-vh0fsht2hyPJzTnTvBIVPWlXEdhjacVvh6c/export?format=csv&gid={gid}"
         df = pd.read_csv(sheet_url)
@@ -92,62 +402,7 @@ def carregar_dados_aba(gid, nome_aba):
                 df[coluna] = df[coluna].apply(converter_valor_brasileiro)
 
         if 'data' in df.columns:
-            # Tratamento flexível para datas
-            try:
-                # Para o Stripe, tentamos vários formatos de data
-                if nome_aba == 'Stripe':
-                    # Primeiro, tente converter diretamente (formato padrão)
-                    try:
-                        df['data'] = pd.to_datetime(df['data'], errors='coerce')
-                    except:
-                        pass
-                    
-                    # Se ainda tiver valores NaT, tente outros formatos
-                    if df['data'].isna().any():
-                        # Tente interpretar como timestamp Unix (comum no Stripe)
-                        try:
-                            mask_nan = df['data'].isna()
-                            df.loc[mask_nan, 'data'] = pd.to_datetime(df.loc[mask_nan, 'data'].astype(float), unit='s', errors='coerce')
-                        except:
-                            pass
-                    
-                    # Se ainda tiver valores NaT, tente formatos específicos
-                    if df['data'].isna().any():
-                        formatos = ['%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y', '%d/%m/%Y %H:%M:%S', '%Y-%m-%d %H:%M:%S']
-                        for formato in formatos:
-                            try:
-                                mask_nan = df['data'].isna()
-                                df.loc[mask_nan, 'data'] = pd.to_datetime(df.loc[mask_nan, 'data'], format=formato, errors='coerce')
-                            except:
-                                continue
-                else:
-                    # Para outras abas, assumimos formato brasileiro (dia/mês/ano)
-                    df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
-                
-                # Se ainda houver valores NaT, tente converter como texto para data
-                if df['data'].isna().any():
-                    try:
-                        mask_nan = df['data'].isna()
-                        # Tente extrair apenas a data de strings mais complexas
-                        data_texto = df.loc[mask_nan, 'data'].astype(str)
-                        # Tente encontrar padrões de data no texto
-                        for i, texto in enumerate(data_texto):
-                            # Tente extrair padrões comuns de data do texto
-                            import re
-                            # Procure por padrões como DD/MM/YYYY ou YYYY-MM-DD
-                            padrao_data = re.search(r'(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}[/-]\d{1,2}[/-]\d{1,2})', texto)
-                            if padrao_data:
-                                data_texto.iloc[i] = padrao_data.group(0)
-                        
-                        df.loc[mask_nan, 'data'] = pd.to_datetime(data_texto, errors='coerce', dayfirst=True)
-                    except:
-                        pass
-            except Exception as e:
-                st.warning(f"Erro ao processar datas na aba {nome_aba}: {str(e)}")
-                # Em caso de erro, mantenha as datas como texto
-                df['data'] = df['data'].astype(str)
-            
-            # Remova linhas com datas inválidas
+            df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
             df.dropna(subset=['data'], inplace=True)
 
         if nome_aba == 'Kiwify' and 'receita_bruta' in df.columns:
@@ -160,58 +415,39 @@ def carregar_dados_aba(gid, nome_aba):
 
 @st.cache_data
 def carregar_todos_dados():
+    """Carrega os dados de todas as abas e aplica o filtro de data inicial."""
     dados = {}
     gids = {'Kiwify': 0, 'Stripe': 365912887, 'Meta': 1945405496, 'Despesas': 1740447033}
     for aba, gid in gids.items():
-        df, mensagem = carregar_dados_aba(gid, aba)
+        df, _ = carregar_dados_aba(gid, aba)
+        
         if df is not None and 'data' in df.columns:
             data_inicio_operacao = pd.to_datetime('2022-11-16')
-            # Certifique-se de que a coluna data é datetime antes de filtrar
-            if pd.api.types.is_datetime64_any_dtype(df['data']):
-                df = df[df['data'] >= data_inicio_operacao]
-            else:
-                # Se não for datetime, tente converter novamente
-                try:
-                    df['data'] = pd.to_datetime(df['data'], errors='coerce')
-                    df = df[df['data'] >= data_inicio_operacao]
-                except:
-                    # Se falhar, mantenha todos os dados
-                    pass
+            df = df[df['data'] >= data_inicio_operacao]
+
         dados[aba] = df
     return dados
 
 def aplicar_filtro_periodo(df, periodo, data_inicio, data_fim):
     """Aplica filtro de período a um DataFrame."""
-    if df is None or df.empty or 'data' not in df.columns:
-        return df
-
-    if periodo == 'Todo o período':
-        return df
-
-    df_filtrado = df.copy()
-
+    if df is None or df.empty: return df
+    if periodo == 'Todo o período': return df
+    if 'data' not in df.columns: return df.iloc[0:0]
     try:
-        # Certifique-se de que a coluna data é datetime antes de filtrar
-        if not pd.api.types.is_datetime64_any_dtype(df_filtrado['data']):
-            df_filtrado['data'] = pd.to_datetime(df_filtrado['data'], errors='coerce')
-            df_filtrado.dropna(subset=['data'], inplace=True)
-            
+        df_filtrado = df.copy()
         if periodo == 'Personalizado':
             if data_inicio and data_fim:
                 start_date = pd.to_datetime(data_inicio)
                 end_date = pd.to_datetime(data_fim) + timedelta(days=1)
+                
                 df_filtrado = df_filtrado.loc[(df_filtrado['data'] >= start_date) & (df_filtrado['data'] < end_date)]
         else:
             dias = {'7 dias': 7, '15 dias': 15, '30 dias': 30, '90 dias': 90, '180 dias': 180}.get(periodo)
             if dias:
-                data_maxima_nos_dados = df_filtrado['data'].max()
-                if pd.notna(data_maxima_nos_dados):
-                    data_limite = data_maxima_nos_dados - timedelta(days=dias)
-                    df_filtrado = df_filtrado.loc[df_filtrado['data'] >= data_limite]
+                data_limite = pd.to_datetime(datetime.now() - timedelta(days=dias)).normalize()
+                df_filtrado = df_filtrado.loc[df_filtrado['data'] >= data_limite]
         return df_filtrado
-    except Exception as e:
-        st.warning(f"Erro ao aplicar filtro de período: {str(e)}")
-        return df
+    except Exception: return df
 
 with st.spinner('🔄 Carregando dados...'):
     dados = carregar_todos_dados()
@@ -271,50 +507,15 @@ def calcular_metricas(dados_filtrados, dados_completos):
     total_clientes = metricas['vendas_kiwify'] + metricas['assinaturas_stripe']
     metricas['cac'] = metricas['gastos_meta'] / total_clientes if total_clientes > 0 else 0.0
     
-    # Cálculo das métricas de assinatura (MRR, ARR, ARPA, Churn Rate)
     metricas.update({'mrr': 0.0, 'arr': 0.0, 'arpa': 0.0, 'churn_rate': 0.0})
-    
-    # Para calcular MRR corretamente, precisamos usar dados completos do Stripe, não apenas filtrados
-    stripe_completo = dados_completos.get('Stripe') if dados_completos else None
-    
-    if stripe_completo is not None and not stripe_completo.empty:
-        # Calcular MRR baseado em todas as assinaturas ativas (dados completos)
-        if 'status_assinatura' in stripe_completo.columns:
-            ativas_completo = stripe_completo[stripe_completo['status_assinatura'].str.lower().isin(['active', 'ativa', 'trialing'])]
-            clientes_ativos_total = len(ativas_completo)
-            
-            if clientes_ativos_total > 0:
-                # MRR = soma da receita mensal de todas as assinaturas ativas
-                mrr_total = 0.0
-                for _, row in ativas_completo.iterrows():
-                    valor = row.get('receita_bruta', 0)
-                    plano = str(row.get('nome_plano', '')).lower()
-                    
-                    # Converter valores anuais para mensais
-                    if 'anual' in plano or 'yearly' in plano or 'year' in plano:
-                        mrr_total += valor / 12
-                    else:
-                        mrr_total += valor
-                
-                metricas['mrr'] = mrr_total
-                metricas['arr'] = mrr_total * 12
-                metricas['arpa'] = mrr_total / clientes_ativos_total if clientes_ativos_total > 0 else 0.0
-                
-                # Churn rate estimado (pode ser ajustado conforme dados reais)
-                metricas['churn_rate'] = 5.0
-        
-        # Se não temos dados de status, usar uma estimativa baseada na receita do período filtrado
-        elif stripe_df is not None and not stripe_df.empty and 'receita_bruta' in stripe_df.columns:
-            receita_periodo = stripe_df['receita_bruta'].sum()
-            transacoes_periodo = len(stripe_df)
-            
-            if transacoes_periodo > 0:
-                # Estimativa de MRR baseada na receita do período
-                ticket_medio = receita_periodo / transacoes_periodo
-                metricas['mrr'] = ticket_medio * transacoes_periodo
-                metricas['arr'] = metricas['mrr'] * 12
-                metricas['arpa'] = ticket_medio
-                metricas['churn_rate'] = 3.0  # Churn estimado mais baixo
+    if stripe_df is not None and not stripe_df.empty and 'status_assinatura' in stripe_df.columns:
+        ativas = stripe_df[stripe_df['status_assinatura'].str.lower().isin(['active', 'ativa'])]
+        clientes_ativos = len(ativas)
+        if clientes_ativos > 0:
+            metricas['mrr'] = ativas['receita_bruta'].sum() if 'receita_bruta' in ativas.columns else 0.0
+            metricas['arr'] = metricas['mrr'] * 12
+            metricas['arpa'] = metricas['mrr'] / clientes_ativos
+            metricas['churn_rate'] = 5.0
 
     metricas['ltv'] = 0.0
     if metricas['arpa'] > 0 and metricas['churn_rate'] > 0:
@@ -381,7 +582,9 @@ with col4:
     taxa_reembolso = metricas.get('taxa_reembolso', 0)
     cor_reembolso = "#4CAF50" if taxa_reembolso <= 5 else "#FF9800" if taxa_reembolso <= 10 else "#F44336"
     criar_cartao_metrica("📉 Taxa de Reembolso", f"{taxa_reembolso:.1f}%", TEXTOS_AJUDA["Taxa de Reembolso"], color=cor_reembolso)
+
 tab_geral, tab_kiwify, tab_stripe, tab_meta, tab_despesas, tab_dre = st.tabs(["📊 Geral", "💰 Kiwify", "💳 Stripe", "📱 Meta", "💸 Despesas", "📈 DRE"])
+
 with tab_geral:
     st.markdown("<h3>📊 Visão Geral Consolidada</h3>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
@@ -674,7 +877,6 @@ with tab_dre:
         st.caption("ℹ️ Visão em cascata do resultado financeiro, partindo da Receita Bruta até o Lucro Líquido.")
     else:
         st.warning("Sem dados suficientes para gerar o DRE no período selecionado.")
-
 # Rodapé
 st.markdown("---")
 if periodo_selecionado == 'Personalizado':
