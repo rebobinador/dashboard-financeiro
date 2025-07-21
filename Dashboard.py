@@ -78,12 +78,14 @@ def carregar_dados_aba(gid, nome_aba):
             if coluna in df.columns:
                 df[coluna] = df[coluna].apply(converter_valor_brasileiro)
 
-        if 'data' in df.columns:
-            if nome_aba == 'Stripe':
-                df['data'] = pd.to_datetime(df['data'], errors='coerce')
-            else:
-                df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
-            df.dropna(subset=['data'], inplace=True)
+       # CÓDIGO CORRIGIDO (ALTERNATIVA)
+if 'data' in df.columns:
+    if nome_aba == 'Stripe':
+        # Correção: Adicionar dayfirst=True para entender o formato dd/mm/yyyy
+        df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
+    else:
+        df['data'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
+    df.dropna(subset=['data'], inplace=True)
 
         if nome_aba == 'Kiwify' and 'receita_bruta' in df.columns:
             df['receita_liquida'] = df['receita_bruta'] - df.get('taxa', 0) - df.get('comissao_afiliado', 0)
